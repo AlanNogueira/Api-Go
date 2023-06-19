@@ -12,137 +12,122 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+func CreateBook(w http.ResponseWriter, r *http.Request) {
+	var book models.Book
+	err := json.NewDecoder(r.Body).Decode(&book)
+	if err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if err := user.Prepare(); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	collection, err := configuration.DbConnect("users")
+	collection, err := configuration.DbConnect("books")
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	userRepository := repositories.CreateNewUserRepository(collection)
-	response, err := userRepository.Create(user)
+	bookRepository := repositories.CreateNewBooksRepository(collection)
+	response, err := bookRepository.Create(book)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	enc := json.NewEncoder(w)
-
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(response); err != nil {
 		fmt.Println(err.Error())
 	}
 }
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
-	collection, err := configuration.DbConnect("users")
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	userRepository := repositories.CreateNewUserRepository(collection)
-	response, err := userRepository.GetUsers()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		fmt.Println(err.Error())
-	}
-}
-
-func GetUser(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	collection, err := configuration.DbConnect("users")
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	userRepository := repositories.CreateNewUserRepository(collection)
-	response, err := userRepository.GetUser(user.Name)
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		fmt.Println(err.Error())
-	}
-}
-
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func GetBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id := params["userId"]
+	id := params["bookId"]
 
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	if err := user.Prepare(); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	collection, err := configuration.DbConnect("users")
+	collection, err := configuration.DbConnect("books")
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	userRepository := repositories.CreateNewUserRepository(collection)
-	response, err := userRepository.UpdateUser(id, user)
+	bookRepository := repositories.CreateNewBooksRepository(collection)
+	response, err := bookRepository.GetBook(id)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	enc := json.NewEncoder(w)
-
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(response); err != nil {
 		fmt.Println(err.Error())
 	}
 }
 
-func RemoveUser(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	id := params["userId"]
-
-	collection, err := configuration.DbConnect("users")
+func GetBooks(w http.ResponseWriter, r *http.Request) {
+	collection, err := configuration.DbConnect("books")
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	userRepository := repositories.CreateNewUserRepository(collection)
-	response, err := userRepository.RemoveUser(id)
+	bookRepository := repositories.CreateNewBooksRepository(collection)
+	response, err := bookRepository.GetBooks()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(response); err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func UpdateBook(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["bookId"]
+
+	var book models.Book
+	err := json.NewDecoder(r.Body).Decode(&book)
+	if err != nil {
+		responses.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	collection, err := configuration.DbConnect("books")
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	bookRepository := repositories.CreateNewBooksRepository(collection)
+	response, err := bookRepository.UpdateBook(id, book)
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(response); err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func RemoveBook(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["bookId"]
+
+	collection, err := configuration.DbConnect("books")
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	bookRepository := repositories.CreateNewBooksRepository(collection)
+	response, err := bookRepository.RemoveBook(id)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return

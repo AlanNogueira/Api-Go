@@ -45,7 +45,7 @@ func (repository *Users) RemoveUser(userId string) (map[string]interface{}, erro
 
 	err = repository.collection.FindOne(repository.ctx, bson.M{"_id": idPrimitive}).Decode(&user)
 	if err != nil {
-		return nil, errors.New("User not found")
+		return nil, errors.New("user not found")
 	}
 
 	_, err = repository.collection.DeleteOne(repository.ctx, bson.M{"_id": idPrimitive})
@@ -60,16 +60,15 @@ func (repository *Users) RemoveUser(userId string) (map[string]interface{}, erro
 	return res, nil
 }
 
-func (repository *Users) GetUser(userId string) (map[string]interface{}, error) {
-	user := map[string]interface{}{}
-	idPrimitive, err := primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return nil, errors.New("invalid Id")
+func (repository *Users) GetUser(userName string) (models.User, error) {
+	user := models.User{}
+	if userName == "" {
+		return models.User{}, errors.New("invalid Name")
 	}
 
-	err = repository.collection.FindOne(repository.ctx, bson.M{"_id": idPrimitive}).Decode(&user)
+	err := repository.collection.FindOne(repository.ctx, bson.M{"name": userName}).Decode(&user)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return models.User{}, errors.New("user not found")
 	}
 
 	return user, nil
