@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"Api-Go/pkg/configuration"
 	"Api-Go/pkg/entities"
 	"context"
 	"errors"
@@ -15,8 +16,13 @@ type Users struct {
 	ctx        context.Context
 }
 
-func CreateNewUserRepository(collection *mongo.Collection) *Users {
-	return &Users{collection, context.Background()}
+func CreateNewUserRepository() (*Users, error) {
+	collection, err := configuration.DbConnect("users")
+	if err != nil {
+		return nil, err
+	}
+
+	return &Users{collection, context.Background()}, nil
 }
 
 func (repository *Users) Create(user entities.User) (map[string]interface{}, error) {

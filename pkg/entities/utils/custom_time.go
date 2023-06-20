@@ -1,4 +1,4 @@
-package entities
+package utils
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ func (ct *CustomTime) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("\"%s\"", ct.Time.Format(expiryDateLayout))), nil
 }
 
-func (ct *CustomTime) validate() string {
+func (ct *CustomTime) Validate() string {
 	if ct.Time.IsZero() {
 		return "ReleaseDate, "
 	}

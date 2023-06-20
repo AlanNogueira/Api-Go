@@ -1,4 +1,4 @@
-package entities
+package utils
 
 import (
 	"strings"
@@ -12,7 +12,7 @@ type Address struct {
 	State        string `bson:"state,omitempty"`
 }
 
-func (a *Address) validate() string {
+func (a *Address) Validate() string {
 	addressErrors := ""
 	address := Address{}
 	if address == *a {
@@ -37,7 +37,7 @@ func (a *Address) validate() string {
 	return addressErrors
 }
 
-func (a *Address) format() {
+func (a *Address) Format() {
 	a.Street = strings.TrimSpace(a.Street)
 	a.Neighborhood = strings.TrimSpace(a.Neighborhood)
 	a.City = strings.TrimSpace(a.City)

@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"Api-Go/pkg/configuration"
 	"Api-Go/pkg/entities"
 	"context"
 	"errors"
@@ -15,8 +16,13 @@ type Books struct {
 	ctx        context.Context
 }
 
-func CreateNewBooksRepository(collection *mongo.Collection) *Books {
-	return &Books{collection, context.Background()}
+func CreateNewBooksRepository() (*Books, error) {
+	collection, err := configuration.DbConnect("books")
+	if err != nil {
+		return nil, err
+	}
+
+	return &Books{collection, context.Background()}, nil
 }
 
 func (repository *Books) Create(book entities.Book) (map[string]interface{}, error) {

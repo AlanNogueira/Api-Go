@@ -10,25 +10,25 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user entities.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+func CreatePublisher(w http.ResponseWriter, r *http.Request) {
+	var publisher entities.Publisher
+	if err := json.NewDecoder(r.Body).Decode(&publisher); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if err := user.Prepare(); err != nil {
+	if err := publisher.Prepare(); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	userRepository, err := repositories.CreateNewUserRepository()
+	publisherRepository, err := repositories.CreateNewPublishersRepository()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	response, err := userRepository.Create(user)
+	response, err := publisherRepository.CreatePublisher(publisher)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -39,17 +39,18 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(response); err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 }
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
-	userRepository, err := repositories.CreateNewUserRepository()
+func GetPublishers(w http.ResponseWriter, r *http.Request) {
+	publisherRepository, err := repositories.CreateNewPublishersRepository()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	response, err := userRepository.GetUsers()
+	response, err := publisherRepository.GetPublishers()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -60,20 +61,21 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(response); err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 }
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func GetPublisher(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	name := params["name"]
 
-	userRepository, err := repositories.CreateNewUserRepository()
+	publisherRepository, err := repositories.CreateNewPublishersRepository()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	response, err := userRepository.GetUser(name)
+	response, err := publisherRepository.GetPublisher(name)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -84,31 +86,27 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(response); err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func UpdatePublisher(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id := params["userId"]
+	Id := params["publisherId"]
 
-	var user entities.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var publisher entities.Publisher
+	if err := json.NewDecoder(r.Body).Decode(&publisher); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if err := user.Prepare(); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	userRepository, err := repositories.CreateNewUserRepository()
+	publisherRepository, err := repositories.CreateNewPublishersRepository()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	response, err := userRepository.UpdateUser(id, user)
+	response, err := publisherRepository.UpdatePublisher(Id, publisher)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -119,20 +117,21 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(response); err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 }
 
-func RemoveUser(w http.ResponseWriter, r *http.Request) {
+func RemovePublisher(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id := params["userId"]
+	Id := params["publisherId"]
 
-	userRepository, err := repositories.CreateNewUserRepository()
+	publisherRepository, err := repositories.CreateNewPublishersRepository()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	response, err := userRepository.RemoveUser(id)
+	response, err := publisherRepository.RemovePublisher(Id)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -143,5 +142,6 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	enc.SetIndent("", "  ")
 	if err := enc.Encode(response); err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 }

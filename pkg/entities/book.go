@@ -1,18 +1,19 @@
 package entities
 
 import (
+	"Api-Go/pkg/entities/utils"
 	"errors"
 	"strings"
 )
 
 type Book struct {
-	Id          string     `bson:"_id,omitempty"`
-	Name        string     `bson:"name,omitempty"`
-	Author      string     `bson:"author,omitempty"`
-	Publisher   string     `bson:"publisher,omitempty"`
-	ReleaseDate CustomTime `bson:"releaseDate,omitempty"`
-	Stock       uint       `bson:"stock,omitempty"`
-	Rented      uint       `bson:"rented"`
+	Id          string           `bson:"_id,omitempty"`
+	Name        string           `bson:"name,omitempty"`
+	Author      string           `bson:"author,omitempty"`
+	Publisher   string           `bson:"publisher,omitempty"`
+	ReleaseDate utils.CustomTime `bson:"releaseDate,omitempty"`
+	Stock       uint             `bson:"stock,omitempty"`
+	Rented      uint             `bson:"rented"`
 }
 
 func (book *Book) Prepare() error {
@@ -35,7 +36,7 @@ func (book *Book) validate() error {
 	if book.Publisher == "" {
 		bookErrors += "Publisher, "
 	}
-	if errors := book.ReleaseDate.validate(); errors != "" {
+	if errors := book.ReleaseDate.Validate(); errors != "" {
 		bookErrors += errors
 	}
 	if book.Stock == 0 {
