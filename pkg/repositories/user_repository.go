@@ -17,11 +17,7 @@ type Users struct {
 }
 
 func CreateNewUserRepository() (*Users, error) {
-	collection, err := configuration.DbConnect("users")
-	if err != nil {
-		return nil, err
-	}
-
+	collection := configuration.Client.Database(configuration.DBName).Collection("users")
 	return &Users{collection, context.Background()}, nil
 }
 
@@ -119,7 +115,7 @@ func (repository *Users) GetUsers() ([]entities.User, error) {
 }
 
 func (repository *Users) UpdateUser(userId string, userNewData entities.User) (map[string]interface{}, error) {
-	user := map[string]interface{}{}
+	var user entities.User
 	idPrimitive, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return nil, errors.New("invalid Id")

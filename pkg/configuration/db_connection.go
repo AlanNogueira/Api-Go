@@ -2,25 +2,30 @@ package configuration
 
 import (
 	"context"
+	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var Client *mongo.Client
+
 const (
 	uri    = "mongodb://localhost:27017"
-	dbName = "shop_db"
+	DBName = "library_db"
 )
 
-func DbConnect(collectionName string) (*mongo.Collection, error) {
+func DbConnect() *mongo.Client {
 	ctx := context.Background()
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
-	collection := client.Database(dbName).Collection(collectionName)
+	return client
+}
 
-	return collection, nil
+func init() {
+	Client = DbConnect()
 }

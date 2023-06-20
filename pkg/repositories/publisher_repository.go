@@ -17,11 +17,7 @@ type Publishers struct {
 }
 
 func CreateNewPublishersRepository() (*Publishers, error) {
-	collection, err := configuration.DbConnect("publishers")
-	if err != nil {
-		return nil, err
-	}
-
+	collection := configuration.Client.Database(configuration.DBName).Collection("publishers")
 	return &Publishers{collection, context.Background()}, nil
 }
 

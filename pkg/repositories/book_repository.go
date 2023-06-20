@@ -17,11 +17,7 @@ type Books struct {
 }
 
 func CreateNewBooksRepository() (*Books, error) {
-	collection, err := configuration.DbConnect("books")
-	if err != nil {
-		return nil, err
-	}
-
+	collection := configuration.Client.Database(configuration.DBName).Collection("books")
 	return &Books{collection, context.Background()}, nil
 }
 

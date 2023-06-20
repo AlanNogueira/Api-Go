@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Api-Go/pkg/configuration"
 	"Api-Go/pkg/router"
 	"fmt"
 	"log"
@@ -8,6 +9,7 @@ import (
 )
 
 func main() {
+	configuration.DbConnect()
 	r := router.Generate()
 
 	fmt.Printf("Inciando na porta 5000")
