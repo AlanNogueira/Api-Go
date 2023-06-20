@@ -19,7 +19,7 @@ var bookRoutes = []Route{
 		RequiresAuthentication: false,
 	},
 	{
-		URI:                    "/books/{bookId}",
+		URI:                    "/books/{name}",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetBook,
 		RequiresAuthentication: false,

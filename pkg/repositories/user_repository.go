@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"Api-Go/pkg/models"
+	"Api-Go/pkg/entities"
 	"context"
 	"errors"
 
@@ -19,7 +19,7 @@ func CreateNewUserRepository(collection *mongo.Collection) *Users {
 	return &Users{collection, context.Background()}
 }
 
-func (repository *Users) Create(user models.User) (map[string]interface{}, error) {
+func (repository *Users) Create(user entities.User) (map[string]interface{}, error) {
 	req, err := repository.collection.InsertOne(repository.ctx, user)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (repository *Users) Create(user models.User) (map[string]interface{}, error
 }
 
 func (repository *Users) RemoveUser(userId string) (map[string]interface{}, error) {
-	var user models.User
+	var user entities.User
 	idPrimitive, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		return nil, errors.New("invalid Id")
@@ -54,27 +54,39 @@ func (repository *Users) RemoveUser(userId string) (map[string]interface{}, erro
 	}
 
 	res := map[string]interface{}{
-		"data": "Document deleted socessfully",
+		"data": "User deleted socessfully",
 	}
 
 	return res, nil
 }
 
-func (repository *Users) GetUser(userName string) (models.User, error) {
-	user := models.User{}
-	if userName == "" {
-		return models.User{}, errors.New("invalid Name")
-	}
-
-	err := repository.collection.FindOne(repository.ctx, bson.M{"name": userName}).Decode(&user)
+func (repository *Users) GetUser(userName string) ([]entities.User, error) {
+	cur, err := repository.collection.Find(repository.ctx, bson.M{"name": bson.M{"$regex": userName, "$options": "i"}})
 	if err != nil {
-		return models.User{}, errors.New("user not found")
+		return nil, err
 	}
 
-	return user, nil
+	defer cur.Close(repository.ctx)
+
+	var users []entities.User
+
+	for cur.Next(repository.ctx) {
+		var user entities.User
+		if err := cur.Decode(&user); err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	if len(users) == 0 {
+		return nil, errors.New("there are no registered books with this name")
+	}
+
+	return users, nil
 }
 
-func (repository *Users) GetUsers() (map[string]interface{}, error) {
+func (repository *Users) GetUsers() ([]entities.User, error) {
 	cur, err := repository.collection.Find(repository.ctx, bson.D{})
 	if err != nil {
 		return nil, err
@@ -82,29 +94,25 @@ func (repository *Users) GetUsers() (map[string]interface{}, error) {
 
 	defer cur.Close(repository.ctx)
 
-	var products []bson.M
+	var users []entities.User
 
 	for cur.Next(repository.ctx) {
-		var product bson.M
-		if err := cur.Decode(&product); err != nil {
+		var user entities.User
+		if err := cur.Decode(&user); err != nil {
 			return nil, err
 		}
 
-		products = append(products, product)
+		users = append(users, user)
 	}
 
-	if len(products) == 0 {
+	if len(users) == 0 {
 		return nil, errors.New("there are no registered users")
-	}
-
-	users := map[string]interface{}{
-		"data": products,
 	}
 
 	return users, nil
 }
 
-func (repository *Users) UpdateUser(userId string, userNewData models.User) (map[string]interface{}, error) {
+func (repository *Users) UpdateUser(userId string, userNewData entities.User) (map[string]interface{}, error) {
 	user := map[string]interface{}{}
 	idPrimitive, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {

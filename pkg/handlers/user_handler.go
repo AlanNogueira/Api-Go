@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"Api-Go/pkg/configuration"
-	"Api-Go/pkg/models"
+	"Api-Go/pkg/entities"
 	"Api-Go/pkg/repositories"
 	"Api-Go/pkg/responses"
 	"encoding/json"
@@ -13,7 +13,7 @@ import (
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user models.User
+	var user entities.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
@@ -68,11 +68,8 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
-		return
-	}
+	params := mux.Vars(r)
+	name := params["name"]
 
 	collection, err := configuration.DbConnect("users")
 	if err != nil {
@@ -81,7 +78,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userRepository := repositories.CreateNewUserRepository(collection)
-	response, err := userRepository.GetUser(user.Name)
+	response, err := userRepository.GetUser(name)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -99,7 +96,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["userId"]
 
-	var user models.User
+	var user entities.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return

@@ -1,4 +1,4 @@
-package models
+package entities
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 )
 
 type User struct {
-	ID        string  `bson:"id,omitempty"`
+	Id        string  `bson:"_id,omitempty"`
 	Name      string  `bson:"name,omitempty"`
 	Email     string  `bson:"email,omitempty"`
 	Phone     string  `bson:"phone,omitempty"`

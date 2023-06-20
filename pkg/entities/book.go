@@ -1,4 +1,4 @@
-package models
+package entities
 
 import (
 	"errors"
@@ -6,13 +6,13 @@ import (
 )
 
 type Book struct {
-	ID          string `bson:"id,omitempty"`
-	Name        string `bson:"name,omitempty"`
-	Author      string `bson:"author,omitempty"`
-	Publisher   string `bson:"publisher,omitempty"`
-	ReleaseDate string `bson:"releaseDate,omitempty"`
-	Stock       uint   `bson:"stock,omitempty"`
-	Rented      uint   `bson:"rented"`
+	Id          string     `bson:"_id,omitempty"`
+	Name        string     `bson:"name,omitempty"`
+	Author      string     `bson:"author,omitempty"`
+	Publisher   string     `bson:"publisher,omitempty"`
+	ReleaseDate CustomTime `bson:"releaseDate,omitempty"`
+	Stock       uint       `bson:"stock,omitempty"`
+	Rented      uint       `bson:"rented"`
 }
 
 func (book *Book) Prepare() error {
@@ -35,8 +35,8 @@ func (book *Book) validate() error {
 	if book.Publisher == "" {
 		bookErrors += "Publisher, "
 	}
-	if book.ReleaseDate == "" {
-		bookErrors += "ReleaseDate, "
+	if errors := book.ReleaseDate.validate(); errors != "" {
+		bookErrors += errors
 	}
 	if book.Stock == 0 {
 		bookErrors += "Stock, "
@@ -51,5 +51,4 @@ func (book *Book) format() {
 	book.Name = strings.TrimSpace(book.Name)
 	book.Author = strings.TrimSpace(book.Author)
 	book.Publisher = strings.TrimSpace(book.Publisher)
-	book.ReleaseDate = strings.TrimSpace(book.ReleaseDate)
 }

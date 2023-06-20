@@ -19,7 +19,7 @@ var userRoutes = []Route{
 		RequiresAuthentication: false,
 	},
 	{
-		URI:                    "/users/GetUserByName",
+		URI:                    "/users/{name}",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetUser,
 		RequiresAuthentication: false,

@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"Api-Go/pkg/models"
+	"Api-Go/pkg/entities"
 	"context"
 	"errors"
 
@@ -19,7 +19,7 @@ func CreateNewBooksRepository(collection *mongo.Collection) *Books {
 	return &Books{collection, context.Background()}
 }
 
-func (repository *Books) Create(book models.Book) (map[string]interface{}, error) {
+func (repository *Books) Create(book entities.Book) (map[string]interface{}, error) {
 	req, err := repository.collection.InsertOne(repository.ctx, book)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (repository *Books) Create(book models.Book) (map[string]interface{}, error
 }
 
 func (repository *Books) RemoveBook(bookId string) (map[string]interface{}, error) {
-	var book models.Book
+	var book entities.Book
 	idPrimitive, err := primitive.ObjectIDFromHex(bookId)
 	if err != nil {
 		return nil, err
@@ -48,44 +48,37 @@ func (repository *Books) RemoveBook(bookId string) (map[string]interface{}, erro
 		return nil, errors.New("book not found")
 	}
 
+	if book.Rented != 0 {
+		return nil, errors.New("unable to delete rented books")
+	}
+
 	_, err = repository.collection.DeleteOne(repository.ctx, bson.M{"_id": idPrimitive})
 	if err != nil {
 		return nil, errors.New("error deleting book")
 	}
 
 	res := map[string]interface{}{
-		"data": "Document deleted socessfully",
+		"data": "Book deleted socessfully",
 	}
 
 	return res, nil
 }
 
-func (repository *Books) GetBook(bookId string) (models.Book, error) {
-	var book models.Book
-	idPrimitive, err := primitive.ObjectIDFromHex(bookId)
-	if err != nil {
-		return models.Book{}, err
-	}
-
-	err = repository.collection.FindOne(repository.ctx, bson.M{"_id": idPrimitive}).Decode(&book)
-	if err != nil {
-		return models.Book{}, errors.New("book not found")
-	}
-
-	return book, nil
-}
-
-func (repository *Books) GetBooks() ([]models.Book, error) {
-	cur, err := repository.collection.Find(repository.ctx, bson.D{})
+func (repository *Books) GetBook(bookData entities.Book) ([]entities.Book, error) {
+	cur, err := repository.collection.Find(repository.ctx,
+		bson.M{"name": bson.M{"$regex": bookData.Name, "$options": "i"},
+			"author":           bson.M{"$regex": bookData.Author, "$options": "i"},
+			"publisher":        bson.M{"$regex": bookData.Publisher, "$options": "i"},
+			"releaseDate.time": bson.M{"$eq": bookData.ReleaseDate.Time}})
 	if err != nil {
 		return nil, err
 	}
 
 	defer cur.Close(repository.ctx)
-	var books []models.Book
+	var books []entities.Book
 
 	for cur.Next(repository.ctx) {
-		var book models.Book
+		var book entities.Book
 
 		if err := cur.Decode(&book); err != nil {
 			return nil, err
@@ -101,8 +94,34 @@ func (repository *Books) GetBooks() ([]models.Book, error) {
 	return books, nil
 }
 
-func (repository *Books) UpdateBook(bookId string, bookNewData models.Book) (map[string]interface{}, error) {
-	var book models.Book
+func (repository *Books) GetBooks() ([]entities.Book, error) {
+	cur, err := repository.collection.Find(repository.ctx, bson.D{})
+	if err != nil {
+		return nil, err
+	}
+
+	defer cur.Close(repository.ctx)
+	var books []entities.Book
+
+	for cur.Next(repository.ctx) {
+		var book entities.Book
+
+		if err := cur.Decode(&book); err != nil {
+			return nil, err
+		}
+
+		books = append(books, book)
+	}
+
+	if len(books) == 0 {
+		return nil, errors.New("there are no registered books")
+	}
+
+	return books, nil
+}
+
+func (repository *Books) UpdateBook(bookId string, bookNewData entities.Book) (map[string]interface{}, error) {
+	var book entities.Book
 	idPrimitive, err := primitive.ObjectIDFromHex(bookId)
 	if err != nil {
 		return nil, errors.New("invalid Id")
