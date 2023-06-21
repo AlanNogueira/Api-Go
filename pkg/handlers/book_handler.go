@@ -25,24 +25,14 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bookRepository, err := repositories.CreateNewBooksRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	bookRepository := repositories.CreateNewBooksRepository()
 	response, err := bookRepository.Create(book)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func GetBook(w http.ResponseWriter, r *http.Request) {
@@ -60,45 +50,25 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		ReleaseDate: utils.CustomTime{Time: time},
 	}
 
-	bookRepository, err := repositories.CreateNewBooksRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	bookRepository := repositories.CreateNewBooksRepository()
 	response, err := bookRepository.GetBook(book)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func GetBooks(w http.ResponseWriter, r *http.Request) {
-	bookRepository, err := repositories.CreateNewBooksRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	bookRepository := repositories.CreateNewBooksRepository()
 	response, err := bookRepository.GetBooks()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
@@ -112,47 +82,26 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bookRepository, err := repositories.CreateNewBooksRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	bookRepository := repositories.CreateNewBooksRepository()
 	response, err := bookRepository.UpdateBook(id, book)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func RemoveBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["bookId"]
 
-	bookRepository, err := repositories.CreateNewBooksRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	bookRepository := repositories.CreateNewBooksRepository()
 	response, err := bookRepository.RemoveBook(id)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }

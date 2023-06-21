@@ -52,4 +52,5 @@ func (book *Book) format() {
 	book.Name = strings.TrimSpace(book.Name)
 	book.Author = strings.TrimSpace(book.Author)
 	book.Publisher = strings.TrimSpace(book.Publisher)
+	book.ReleaseDate.Format()
 }

@@ -36,3 +36,13 @@ func (ct *CustomTime) Validate() string {
 
 	return ""
 }
+
+func (ct *CustomTime) Format() (err error) {
+	stringDate := ct.Time.Format(layout)
+	ct.Time, err = time.Parse(layout, stringDate)
+	if err != nil {
+		return
+	}
+
+	return nil
+}

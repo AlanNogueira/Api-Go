@@ -22,69 +22,39 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userRepository, err := repositories.CreateNewUserRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	userRepository := repositories.CreateNewUserRepository()
 	response, err := userRepository.Create(user)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	userRepository, err := repositories.CreateNewUserRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	userRepository := repositories.CreateNewUserRepository()
 	response, err := userRepository.GetUsers()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	name := params["name"]
 
-	userRepository, err := repositories.CreateNewUserRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	userRepository := repositories.CreateNewUserRepository()
 	response, err := userRepository.GetUser(name)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -102,46 +72,26 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userRepository, err := repositories.CreateNewUserRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	userRepository := repositories.CreateNewUserRepository()
 	response, err := userRepository.UpdateUser(id, user)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["userId"]
 
-	userRepository, err := repositories.CreateNewUserRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	userRepository := repositories.CreateNewUserRepository()
 	response, err := userRepository.RemoveUser(id)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }

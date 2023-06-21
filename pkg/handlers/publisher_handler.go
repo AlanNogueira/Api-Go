@@ -22,72 +22,39 @@ func CreatePublisher(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	publisherRepository, err := repositories.CreateNewPublishersRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	publisherRepository := repositories.CreateNewPublishersRepository()
 	response, err := publisherRepository.CreatePublisher(publisher)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func GetPublishers(w http.ResponseWriter, r *http.Request) {
-	publisherRepository, err := repositories.CreateNewPublishersRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	publisherRepository := repositories.CreateNewPublishersRepository()
 	response, err := publisherRepository.GetPublishers()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func GetPublisher(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	name := params["name"]
 
-	publisherRepository, err := repositories.CreateNewPublishersRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	publisherRepository := repositories.CreateNewPublishersRepository()
 	response, err := publisherRepository.GetPublisher(name)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func UpdatePublisher(w http.ResponseWriter, r *http.Request) {
@@ -100,48 +67,26 @@ func UpdatePublisher(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	publisherRepository, err := repositories.CreateNewPublishersRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	publisherRepository := repositories.CreateNewPublishersRepository()
 	response, err := publisherRepository.UpdatePublisher(Id, publisher)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }
 
 func RemovePublisher(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	Id := params["publisherId"]
 
-	publisherRepository, err := repositories.CreateNewPublishersRepository()
-	if err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
-
+	publisherRepository := repositories.CreateNewPublishersRepository()
 	response, err := publisherRepository.RemovePublisher(Id)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	enc := json.NewEncoder(w)
-
-	enc.SetIndent("", "  ")
-	if err := enc.Encode(response); err != nil {
-		responses.Error(w, http.StatusInternalServerError, err)
-		return
-	}
+	responses.JSON(w, http.StatusCreated, response)
 }

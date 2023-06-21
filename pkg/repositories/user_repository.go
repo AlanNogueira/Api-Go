@@ -16,12 +16,17 @@ type Users struct {
 	ctx        context.Context
 }
 
-func CreateNewUserRepository() (*Users, error) {
+func CreateNewUserRepository() *Users {
 	collection := configuration.Client.Database(configuration.DBName).Collection("users")
-	return &Users{collection, context.Background()}, nil
+	return &Users{collection, context.Background()}
 }
 
 func (repository *Users) Create(user entities.User) (map[string]interface{}, error) {
+	exists, _ := repository.collection.CountDocuments(repository.ctx, bson.M{"name": user.Name})
+	if exists > 0 {
+		return nil, errors.New("this user already exists")
+	}
+
 	req, err := repository.collection.InsertOne(repository.ctx, user)
 	if err != nil {
 		return nil, err
@@ -48,6 +53,15 @@ func (repository *Users) RemoveUser(userId string) (map[string]interface{}, erro
 	err = repository.collection.FindOne(repository.ctx, bson.M{"_id": idPrimitive}).Decode(&user)
 	if err != nil {
 		return nil, errors.New("user not found")
+	}
+
+	rentRepository := CreateNewRentRepository()
+	existsRentedBooks, err := rentRepository.CheckRentedBooksByUserName(user.Name)
+	if err != nil {
+		return nil, errors.New("unable to perform this action at the moment, please try again later")
+	}
+	if existsRentedBooks {
+		return nil, errors.New("this user has rented books, you can't delete it")
 	}
 
 	_, err = repository.collection.DeleteOne(repository.ctx, bson.M{"_id": idPrimitive})
@@ -139,4 +153,15 @@ func (repository *Users) UpdateUser(userId string, userNewData entities.User) (m
 	}
 
 	return res, nil
+}
+
+func (repository *Users) GetUserByName(userName string) (entities.User, error) {
+	var user entities.User
+
+	err := repository.collection.FindOne(repository.ctx, bson.M{"name": userName}).Decode(&user)
+	if err != nil {
+		return entities.User{}, err
+	}
+
+	return user, nil
 }

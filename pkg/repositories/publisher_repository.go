@@ -16,13 +16,18 @@ type Publishers struct {
 	ctx        context.Context
 }
 
-func CreateNewPublishersRepository() (*Publishers, error) {
+func CreateNewPublishersRepository() *Publishers {
 	collection := configuration.Client.Database(configuration.DBName).Collection("publishers")
-	return &Publishers{collection, context.Background()}, nil
+	return &Publishers{collection, context.Background()}
 }
 
-func (repository *Publishers) CreatePublisher(data interface{}) (map[string]interface{}, error) {
-	req, err := repository.collection.InsertOne(repository.ctx, data)
+func (repository *Publishers) CreatePublisher(publisher entities.Publisher) (map[string]interface{}, error) {
+	exists, _ := repository.collection.CountDocuments(repository.ctx, bson.M{"name": publisher.Name})
+	if exists > 0 {
+		return nil, errors.New("this publisher already exists")
+	}
+
+	req, err := repository.collection.InsertOne(repository.ctx, publisher)
 	if err != nil {
 		return nil, err
 	}
@@ -66,6 +71,8 @@ func (repository *Publishers) GetPublisher(publisherName string) ([]entities.Pub
 		return nil, err
 	}
 
+	defer cur.Close(repository.ctx)
+
 	var publishers []entities.Publisher
 
 	for cur.Next(repository.ctx) {
@@ -90,6 +97,8 @@ func (repository *Publishers) GetPublishers() ([]entities.Publisher, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	defer cur.Close(repository.ctx)
 
 	var publishers []entities.Publisher
 
@@ -135,4 +144,15 @@ func (repository *Publishers) UpdatePublisher(publisherId string, newPublisherDa
 	}
 
 	return res, nil
+}
+
+func (repository *Publishers) GetPublisherByName(publisherName string) (entities.Publisher, error) {
+	var publisher entities.Publisher
+
+	err := repository.collection.FindOne(repository.ctx, bson.M{"name": publisherName}).Decode(&publisher)
+	if err != nil {
+		return entities.Publisher{}, err
+	}
+
+	return publisher, nil
 }
