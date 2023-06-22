@@ -182,13 +182,14 @@ func (repository *Books) GetBookByName(bookName string) (entities.Book, error) {
 
 func (repository *Books) AddRentOfBook(book entities.Book) error {
 	newRentedNumber := book.Rented + 1
+	numberOfRents := book.NumberOfRents + 1
 
 	if newRentedNumber > book.Stock {
 		return errors.New("there is no more of this book in stock")
 	}
 
 	filter := bson.M{"name": book.Name}
-	fields := bson.M{"$set": bson.M{"rented": newRentedNumber}}
+	fields := bson.M{"$set": bson.M{"rented": newRentedNumber, "numberOfRents": numberOfRents}}
 
 	_, err := repository.collection.UpdateOne(repository.ctx, filter, fields)
 	if err != nil {
@@ -213,4 +214,45 @@ func (repository *Books) FinalizeBookRent(book entities.Book) error {
 	}
 
 	return nil
+}
+
+func (repository *Books) GetMostRentedBook() (interface{}, error) {
+	// type typeCur struct {
+	// 	Id       string `bson:"_id,omitempty"`
+	// 	numBooks int    `bson:"numBooks"`
+	// }
+	pipe := []bson.M{
+		{
+			"$group": bson.M{
+				"_id":      "$bookName",
+				"numBooks": bson.M{"$sum": 1},
+				"name":     bson.M{"$first": "$bookName"},
+			},
+		},
+	}
+	var mostRentedBook []map[string]interface{}
+	cur, err := repository.collection.Aggregate(repository.ctx, pipe)
+	// cur, err := repository.collection.Find(repository.ctx, bson.D{})
+	if err != nil {
+		return []entities.Book{}, err
+	}
+	defer cur.Close(repository.ctx)
+
+	if err := cur.All(repository.ctx, &mostRentedBook); err != nil {
+		return []entities.Book{}, err
+	}
+
+	// for cur.Next(repository.ctx) {
+	// 	var book map[string]interface{}
+
+	// 	if err := cur.Decode(&book); err != nil {
+	// 		return []entities.Book{}, err
+	// 	}
+	// 	mostRentedBook = append(mostRentedBook, book)
+	// 	// if mostRentedBook.NumberOfRents < book.NumberOfRents {
+	// 	// 	mostRentedBook = book
+	// 	// }
+	// }
+
+	return mostRentedBook, nil
 }

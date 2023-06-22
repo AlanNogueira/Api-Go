@@ -16,12 +16,12 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	var book entities.Book
 	err := json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	if err := book.Prepare(); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -78,7 +78,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	var book entities.Book
 	err := json.NewDecoder(r.Body).Decode(&book)
 	if err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 

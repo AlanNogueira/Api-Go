@@ -10,31 +10,31 @@ var publisherRoutes = []Route{
 		URI:                    "/publishers",
 		Method:                 http.MethodPost,
 		Function:               handlers.CreatePublisher,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/publishers",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetPublishers,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/publishers/{name}",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetPublisher,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/publishers/{publisherId}",
 		Method:                 http.MethodPut,
 		Function:               handlers.UpdatePublisher,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/publishers/{publisherId}",
 		Method:                 http.MethodDelete,
 		Function:               handlers.RemovePublisher,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 }
 

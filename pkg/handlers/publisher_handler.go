@@ -13,12 +13,12 @@ import (
 func CreatePublisher(w http.ResponseWriter, r *http.Request) {
 	var publisher entities.Publisher
 	if err := json.NewDecoder(r.Body).Decode(&publisher); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	if err := publisher.Prepare(); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func UpdatePublisher(w http.ResponseWriter, r *http.Request) {
 
 	var publisher entities.Publisher
 	if err := json.NewDecoder(r.Body).Decode(&publisher); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 

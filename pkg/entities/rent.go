@@ -41,7 +41,7 @@ func (rent *Rent) validate() error {
 		rentErrors += "BookAuthor, "
 	}
 	if !utils.ValidateDeliveryDate(rent.ExpectedDeliveryDate) {
-		rentErrors += "DeliveryDate - delivery date must be within 30 days, "
+		rentErrors += "DeliveryDate - the delivery date must be within 30 days from today, "
 	}
 	if rentErrors != "" {
 		return errors.New("There are errors in the fields: " + rentErrors)

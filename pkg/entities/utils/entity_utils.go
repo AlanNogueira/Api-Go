@@ -20,32 +20,46 @@ func ValidateName(name string) bool {
 }
 
 func ValidatePassword(password string) bool {
-	letters := 0
-	var sevenOrMore, number, upper, special bool
+	characters := 0
+	var eighth, number, upper, special bool
 	for _, character := range password {
 		switch {
 		case unicode.IsNumber(character):
 			number = true
+			characters++
 		case unicode.IsUpper(character):
 			upper = true
-			letters++
+			characters++
 		case unicode.IsPunct(character) || unicode.IsSymbol(character):
 			special = true
+			characters++
 		case unicode.IsLetter(character) || character == ' ':
-			letters++
+			characters++
 		}
 	}
-	sevenOrMore = letters >= 7
-	return sevenOrMore && number && upper && special
+	eighth = characters >= 7
+	return eighth && number && upper && special
 }
 
 func ValidateDeliveryDate(date CustomTime) bool {
 	dateNow := time.Now().Format(layout)
-	maxDeliveryDate, err := time.Parse(layout, dateNow)
+	minDeliveryDate, err := time.Parse(layout, dateNow)
 	if err != nil {
 		return false
 	}
-	maxDeliveryDate = maxDeliveryDate.AddDate(0, 0, 30)
+	maxDeliveryDate := minDeliveryDate.AddDate(0, 0, 30)
 
-	return !date.Time.IsZero() && !date.Time.After(maxDeliveryDate)
+	return !date.Time.After(maxDeliveryDate) && !date.Time.Before(minDeliveryDate)
+}
+
+func ReturnMessageOrValue(value interface{}, valueType string) interface{} {
+	if value == nil {
+		if valueType == "out" {
+			return "no books out of the limit date"
+		} else if valueType == "within" {
+			return "no books within the limit date"
+		}
+	}
+
+	return value
 }

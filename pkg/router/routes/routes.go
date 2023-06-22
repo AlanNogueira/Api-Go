@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"Api-Go/pkg/middlewares"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,7 +18,13 @@ type Route struct {
 
 func Configure(r *mux.Router) *mux.Router {
 	for _, route := range Routes {
-		r.HandleFunc(route.URI, route.Function).Methods(route.Method)
+
+		if route.RequiresAuthentication {
+			r.HandleFunc(route.URI, middlewares.Authenticate(route.Function)).Methods(route.Method)
+		} else {
+			r.HandleFunc(route.URI, route.Function).Methods(route.Method)
+		}
+
 	}
 
 	return r

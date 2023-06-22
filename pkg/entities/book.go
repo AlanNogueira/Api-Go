@@ -7,13 +7,14 @@ import (
 )
 
 type Book struct {
-	Id          string           `bson:"_id,omitempty"`
-	Name        string           `bson:"name,omitempty"`
-	Author      string           `bson:"author,omitempty"`
-	Publisher   string           `bson:"publisher,omitempty"`
-	ReleaseDate utils.CustomTime `bson:"releaseDate,omitempty"`
-	Stock       uint             `bson:"stock,omitempty"`
-	Rented      uint             `bson:"rented"`
+	Id            string           `bson:"_id,omitempty"`
+	Name          string           `bson:"name,omitempty"`
+	Author        string           `bson:"author,omitempty"`
+	Publisher     string           `bson:"publisher,omitempty"`
+	ReleaseDate   utils.CustomTime `bson:"releaseDate,omitempty"`
+	Stock         uint             `bson:"stock,omitempty"`
+	Rented        uint             `bson:"rented"`
+	NumberOfRents uint             `bson:"numberOfRents"`
 }
 
 func (book *Book) Prepare() error {

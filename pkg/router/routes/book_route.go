@@ -10,31 +10,31 @@ var bookRoutes = []Route{
 		URI:                    "/books",
 		Method:                 http.MethodPost,
 		Function:               handlers.CreateBook,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/books",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetBooks,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/books/{name}",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetBook,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/books/{bookId}",
 		Method:                 http.MethodPut,
 		Function:               handlers.UpdateBook,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/books/{bookId}",
 		Method:                 http.MethodDelete,
 		Function:               handlers.RemoveBook,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 }
 

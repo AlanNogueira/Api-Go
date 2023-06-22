@@ -13,12 +13,12 @@ import (
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user entities.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	if err := user.Prepare(); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -63,12 +63,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	var user entities.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	if err := user.Prepare(); err != nil {
-		responses.Error(w, http.StatusBadRequest, err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 

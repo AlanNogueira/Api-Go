@@ -10,31 +10,31 @@ var userRoutes = []Route{
 		URI:                    "/users",
 		Method:                 http.MethodPost,
 		Function:               handlers.CreateUser,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/users",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetUsers,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/users/{name}",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetUser,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/users/{userId}",
 		Method:                 http.MethodPut,
 		Function:               handlers.UpdateUser,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 	{
 		URI:                    "/users/{userId}",
 		Method:                 http.MethodDelete,
 		Function:               handlers.RemoveUser,
-		RequiresAuthentication: false,
+		RequiresAuthentication: true,
 	},
 }
 
