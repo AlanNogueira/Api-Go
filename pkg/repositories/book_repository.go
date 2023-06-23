@@ -174,7 +174,7 @@ func (repository *Books) GetBookByName(bookName string) (entities.Book, error) {
 
 	err := repository.collection.FindOne(repository.ctx, bson.M{"name": bookName}).Decode(&book)
 	if err != nil {
-		return entities.Book{}, err
+		return entities.Book{}, errors.New("book not found")
 	}
 
 	return book, nil

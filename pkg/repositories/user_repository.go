@@ -96,7 +96,7 @@ func (repository *Users) GetUser(userName string) ([]entities.User, error) {
 	}
 
 	if len(users) == 0 {
-		return nil, errors.New("there are no registered books with this name")
+		return nil, errors.New("there are no registered users with this name")
 	}
 
 	return users, nil
@@ -160,7 +160,7 @@ func (repository *Users) GetUserByName(userName string) (entities.User, error) {
 
 	err := repository.collection.FindOne(repository.ctx, bson.M{"name": userName}).Decode(&user)
 	if err != nil {
-		return entities.User{}, err
+		return entities.User{}, errors.New("user not found")
 	}
 
 	return user, nil

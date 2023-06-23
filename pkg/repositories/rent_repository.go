@@ -27,10 +27,10 @@ func CreateNewRentRepository() *Rents {
 func (repository *Rents) CreateRent(rent entities.Rent) (map[string]interface{}, error) {
 	existRent, err := repository.collection.CountDocuments(repository.ctx,
 		bson.M{
-			"userName":      bson.M{"$regex": rent.UserName, "$options": "i"},
-			"bookAuthor":    bson.M{"$regex": rent.BookAuthor, "$options": "i"},
-			"bookPublisher": bson.M{"$regex": rent.BookPublisher, "$options": "i"},
-			"bookName":      bson.M{"$regex": rent.BookName, "$options": "i"},
+			"userName":      rent.UserName,
+			"bookAuthor":    rent.BookAuthor,
+			"bookPublisher": rent.BookPublisher,
+			"bookName":      rent.BookName,
 			"delivered":     bson.M{"$eq": false},
 		})
 
@@ -53,7 +53,7 @@ func (repository *Rents) CreateRent(rent entities.Rent) (map[string]interface{},
 	if err != nil {
 		return nil, errors.New("book not found")
 	}
-	//Verificando se o autor existe
+	//Verificando se a editora existe
 	publisherRepository := CreateNewPublishersRepository()
 	if _, err := publisherRepository.GetPublisherByName(rent.BookPublisher); err != nil {
 		return nil, errors.New("publisher not found")
@@ -105,15 +105,18 @@ func (repository *Rents) GetNotDeliveredRents() ([]entities.Rent, error) {
 }
 
 func (repository *Rents) GetRent(filters map[string]string) ([]entities.Rent, error) {
-	delivered, _ := strconv.ParseBool(filters["rentStatus"])
-	cur, err := repository.collection.Find(repository.ctx,
-		bson.M{
-			"userName":      bson.M{"$regex": filters["userName"], "$options": "i"},
-			"bookAuthor":    bson.M{"$regex": filters["bookAuthor"], "$options": "i"},
-			"bookPublisher": bson.M{"$regex": filters["bookPublisher"], "$options": "i"},
-			"bookName":      bson.M{"$regex": filters["bookName"], "$options": "i"},
-			"delivered":     bson.M{"$eq": delivered},
-		})
+	fil := bson.M{
+		"userName":      bson.M{"$regex": filters["userName"], "$options": "i"},
+		"bookAuthor":    bson.M{"$regex": filters["bookAuthor"], "$options": "i"},
+		"bookPublisher": bson.M{"$regex": filters["bookPublisher"], "$options": "i"},
+		"bookName":      bson.M{"$regex": filters["bookName"], "$options": "i"},
+	}
+	if filters["rentStatus"] != "" {
+		delivered, _ := strconv.ParseBool(filters["rentStatus"])
+		fil["delivered"] = bson.M{"$eq": delivered}
+	}
+
+	cur, err := repository.collection.Find(repository.ctx, fil)
 	if err != nil {
 		return nil, err
 	}
@@ -130,6 +133,10 @@ func (repository *Rents) GetRent(filters map[string]string) ([]entities.Rent, er
 		}
 
 		rents = append(rents, rent)
+	}
+
+	if len(rents) == 0 {
+		return nil, errors.New("there are no rents")
 	}
 
 	return rents, nil
@@ -321,6 +328,10 @@ func (repository *Rents) GetNumberOfBooksRentsByUser(userName string) (map[strin
 
 	if err := cur.All(repository.ctx, &mostRentedBook); err != nil {
 		return nil, err
+	}
+
+	if len(mostRentedBook) == 0 {
+		return nil, errors.New("this user has no rentals")
 	}
 
 	res := map[string]interface{}{
