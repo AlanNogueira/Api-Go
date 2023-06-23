@@ -216,43 +216,27 @@ func (repository *Books) FinalizeBookRent(book entities.Book) error {
 	return nil
 }
 
-func (repository *Books) GetMostRentedBook() (interface{}, error) {
-	// type typeCur struct {
-	// 	Id       string `bson:"_id,omitempty"`
-	// 	numBooks int    `bson:"numBooks"`
-	// }
+func (repository *Books) GetMostRentedBook() (map[string]interface{}, error) {
+	var mostRentedBook []map[string]interface{}
+
 	pipe := []bson.M{
 		{
-			"$group": bson.M{
-				"_id":      "$bookName",
-				"numBooks": bson.M{"$sum": 1},
-				"name":     bson.M{"$first": "$bookName"},
-			},
+			"$sort": bson.M{"numberOfRents": -1},
 		},
 	}
-	var mostRentedBook []map[string]interface{}
 	cur, err := repository.collection.Aggregate(repository.ctx, pipe)
-	// cur, err := repository.collection.Find(repository.ctx, bson.D{})
 	if err != nil {
-		return []entities.Book{}, err
+		return nil, err
 	}
+
 	defer cur.Close(repository.ctx)
-
 	if err := cur.All(repository.ctx, &mostRentedBook); err != nil {
-		return []entities.Book{}, err
+		return nil, err
 	}
 
-	// for cur.Next(repository.ctx) {
-	// 	var book map[string]interface{}
+	res := map[string]interface{}{
+		"mostRentedBook": mostRentedBook[0],
+	}
 
-	// 	if err := cur.Decode(&book); err != nil {
-	// 		return []entities.Book{}, err
-	// 	}
-	// 	mostRentedBook = append(mostRentedBook, book)
-	// 	// if mostRentedBook.NumberOfRents < book.NumberOfRents {
-	// 	// 	mostRentedBook = book
-	// 	// }
-	// }
-
-	return mostRentedBook, nil
+	return res, nil
 }

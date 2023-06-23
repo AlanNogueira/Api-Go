@@ -30,8 +30,16 @@ func GetNumberOfOverdueBooks(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, response)
 }
 
-func GetBookRentsByUser(w http.ResponseWriter, r *http.Request) {
-
+func GetNumberOfBooksRentsByUser(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	userName := params["userName"]
+	rentsRepository := repositories.CreateNewRentRepository()
+	response, err := rentsRepository.GetNumberOfBooksRentsByUser(userName)
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, response)
 }
 
 func GetReturnedBooks(w http.ResponseWriter, r *http.Request) {

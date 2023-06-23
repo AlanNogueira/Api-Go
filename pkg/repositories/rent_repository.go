@@ -297,3 +297,38 @@ func (repository *Rents) GetNumberOfOverdueBooks() (map[string]interface{}, erro
 
 	return res, nil
 }
+
+func (repository *Rents) GetNumberOfBooksRentsByUser(userName string) (map[string]interface{}, error) {
+	pipe := []bson.M{
+		{
+			"$match": bson.M{
+				"userName": userName,
+			},
+		},
+		{
+			"$group": bson.M{
+				"_id":      "$userName",
+				"numBooks": bson.M{"$sum": 1},
+			},
+		},
+	}
+	var mostRentedBook []map[string]interface{}
+	cur, err := repository.collection.Aggregate(repository.ctx, pipe)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(repository.ctx)
+
+	if err := cur.All(repository.ctx, &mostRentedBook); err != nil {
+		return nil, err
+	}
+
+	res := map[string]interface{}{
+		"Data": map[string]interface{}{
+			"userName":            mostRentedBook[0]["_id"],
+			"numberOfBooksRented": mostRentedBook[0]["numBooks"],
+		},
+	}
+
+	return res, nil
+}
