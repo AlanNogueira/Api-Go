@@ -76,3 +76,69 @@ func GetMostRentedBook(w http.ResponseWriter, r *http.Request) {
 
 	responses.JSON(w, http.StatusOK, response)
 }
+
+func GetAllReports(w http.ResponseWriter, r *http.Request) {
+	rentsRepository := repositories.CreateNewRentRepository()
+	rentedBooks, err := rentsRepository.GetRentedBooks()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	overdueBooks, err := rentsRepository.GetNumberOfOverdueBooks()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	var rentedBooksByUser []map[string]interface{}
+	var numRentsByUser []map[string]interface{}
+	userRepository := repositories.CreateNewUserRepository()
+	users, err := userRepository.GetUsers()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	for i := 0; i < len(users); i++ {
+		response, err := rentsRepository.GetNumberOfBooksRentsByUser(users[i].Name)
+		if err != nil {
+			responses.Error(w, http.StatusInternalServerError, err)
+			return
+		}
+		rentedBooksByUser = append(rentedBooksByUser, response)
+
+		reponse, err := rentsRepository.GetNumberRentsByUser(users[i].Name)
+		if err != nil {
+			responses.Error(w, http.StatusInternalServerError, err)
+			return
+		}
+		numRentsByUser = append(numRentsByUser, reponse)
+	}
+
+	returnedBooks, err := rentsRepository.GetReturnedBooks()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	bookRepository := repositories.CreateNewBooksRepository()
+	mostRentedBook, err := bookRepository.GetMostRentedBook()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	res := map[string]interface{}{
+		"data": map[string]interface{}{
+			"NumberOfRentedBooks":      rentedBooks["NumberOfRentedBooks"],
+			"NumberOfOverdueBooks":     overdueBooks["NumberOfOverdueBooks"],
+			"NumberOfBooksRentsByUser": rentedBooksByUser,
+			"ReturnedBooks":            returnedBooks,
+			"NumberRentsByUser":        numRentsByUser,
+			"MostRentedBook":           mostRentedBook["mostRentedBook"],
+		},
+	}
+
+	responses.JSON(w, http.StatusOK, res)
+}

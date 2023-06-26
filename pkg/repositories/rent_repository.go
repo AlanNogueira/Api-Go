@@ -210,9 +210,8 @@ func (repository *Rents) GetNumberRentsByUser(userName string) (map[string]inter
 	}
 
 	res := map[string]interface{}{
-		"Data": map[string]interface{}{
-			"NumberRents": numRents,
-		},
+		"userName":    userName,
+		"NumberRents": numRents,
 	}
 
 	return res, nil
@@ -242,10 +241,8 @@ func (repository *Rents) GetReturnedBooks() (map[string]interface{}, error) {
 		}
 	}
 	res := map[string]interface{}{
-		"Data": map[string]interface{}{
-			"outTheTimeLimit":    utils.ReturnMessageOrValue(outTheTimeLimit, "out"),
-			"withinTheTimeLimit": utils.ReturnMessageOrValue(withinTheTimeLimit, "within"),
-		},
+		"outTheTimeLimit":    utils.ReturnMessageOrValue(outTheTimeLimit, "out"),
+		"withinTheTimeLimit": utils.ReturnMessageOrValue(withinTheTimeLimit, "within"),
 	}
 	return res, nil
 }
@@ -261,9 +258,7 @@ func (repository *Rents) GetRentedBooks() (map[string]interface{}, error) {
 	}
 
 	res := map[string]interface{}{
-		"Data": map[string]interface{}{
-			"NumberOfRentedBooks": numRents,
-		},
+		"NumberOfRentedBooks": numRents,
 	}
 
 	return res, nil
@@ -272,7 +267,12 @@ func (repository *Rents) GetRentedBooks() (map[string]interface{}, error) {
 func (repository *Rents) GetNumberOfOverdueBooks() (map[string]interface{}, error) {
 	timeNow := utils.CustomTime{Time: time.Now()}
 	timeNow.Format()
-	cur, err := repository.collection.Find(repository.ctx, bson.M{"delivered": false})
+	cur, err := repository.collection.Find(repository.ctx, bson.M{
+		"$and": bson.A{
+			bson.M{"expectedDeliveryDate.time": bson.M{"$lt": timeNow.Time}},
+			bson.M{"delivered": false},
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -280,16 +280,8 @@ func (repository *Rents) GetNumberOfOverdueBooks() (map[string]interface{}, erro
 	defer cur.Close(repository.ctx)
 
 	var outTheTimeLimit []entities.Rent
-
-	for cur.Next(repository.ctx) {
-		var rent entities.Rent
-		if err := cur.Decode(&rent); err != nil {
-			return nil, err
-		}
-
-		if rent.ExpectedDeliveryDate.Time.Before(timeNow.Time) {
-			outTheTimeLimit = append(outTheTimeLimit, rent)
-		}
+	if err := cur.All(repository.ctx, &outTheTimeLimit); err != nil {
+		return nil, err
 	}
 
 	if len(outTheTimeLimit) == 0 {
@@ -297,9 +289,7 @@ func (repository *Rents) GetNumberOfOverdueBooks() (map[string]interface{}, erro
 	}
 
 	res := map[string]interface{}{
-		"data": map[string]interface{}{
-			"NumberOfOverdueBooks": len(outTheTimeLimit),
-		},
+		"NumberOfOverdueBooks": len(outTheTimeLimit),
 	}
 
 	return res, nil
@@ -314,31 +304,29 @@ func (repository *Rents) GetNumberOfBooksRentsByUser(userName string) (map[strin
 		},
 		{
 			"$group": bson.M{
-				"_id":      "$userName",
+				"_id":      "$bookName",
 				"numBooks": bson.M{"$sum": 1},
 			},
 		},
 	}
-	var mostRentedBook []map[string]interface{}
+	var mostRentedBooks []map[string]interface{}
 	cur, err := repository.collection.Aggregate(repository.ctx, pipe)
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(repository.ctx)
 
-	if err := cur.All(repository.ctx, &mostRentedBook); err != nil {
+	if err := cur.All(repository.ctx, &mostRentedBooks); err != nil {
 		return nil, err
 	}
 
-	if len(mostRentedBook) == 0 {
+	if len(mostRentedBooks) == 0 {
 		return nil, errors.New("this user has no rentals")
 	}
 
 	res := map[string]interface{}{
-		"Data": map[string]interface{}{
-			"userName":            mostRentedBook[0]["_id"],
-			"numberOfBooksRented": mostRentedBook[0]["numBooks"],
-		},
+		"userName": userName,
+		"books":    mostRentedBooks,
 	}
 
 	return res, nil

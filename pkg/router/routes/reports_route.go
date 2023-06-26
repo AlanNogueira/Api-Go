@@ -42,6 +42,12 @@ var reportsRouters = []Route{
 		Function:               handlers.GetMostRentedBook,
 		RequiresAuthentication: true,
 	},
+	{
+		URI:                    "/reports/GetAllReports",
+		Method:                 http.MethodGet,
+		Function:               handlers.GetAllReports,
+		RequiresAuthentication: true,
+	},
 }
 
 func init() {
