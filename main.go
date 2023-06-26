@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	configuration.Load()
 	configuration.DbConnect()
 	r := router.Generate()
 

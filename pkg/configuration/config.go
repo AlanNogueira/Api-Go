@@ -11,7 +11,7 @@ var (
 	SecretKey []byte
 )
 
-func Carregar() {
+func Load() {
 	var erro error
 
 	if erro = godotenv.Load(); erro != nil {
