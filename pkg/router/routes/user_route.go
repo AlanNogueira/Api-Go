@@ -19,7 +19,7 @@ var userRoutes = []Route{
 		RequiresAuthentication: true,
 	},
 	{
-		URI:                    "/users/{name}",
+		URI:                    "/users/{taxNumber}",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetUser,
 		RequiresAuthentication: true,

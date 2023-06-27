@@ -5,6 +5,7 @@ import (
 	"Api-Go/pkg/entities"
 	"context"
 	"errors"
+	"regexp"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -23,9 +24,14 @@ func CreateNewUserRepository() *Users {
 }
 
 func (repository *Users) Create(user entities.User) (map[string]interface{}, error) {
-	exists, _ := repository.collection.CountDocuments(repository.ctx, bson.M{"name": user.Name})
+	exists, _ := repository.collection.CountDocuments(repository.ctx, bson.M{"taxNumber": user.TaxNumber})
 	if exists > 0 {
-		return nil, errors.New("this user already exists")
+		return nil, errors.New("there is already a registered user with this cpf")
+	}
+
+	exists, _ = repository.collection.CountDocuments(repository.ctx, bson.M{"name": user.Name})
+	if exists > 0 {
+		return nil, errors.New("this userName is already in use")
 	}
 
 	req, err := repository.collection.InsertOne(repository.ctx, user)
@@ -77,30 +83,15 @@ func (repository *Users) RemoveUser(userId string) (map[string]interface{}, erro
 	return res, nil
 }
 
-func (repository *Users) GetUser(userName string) ([]entities.User, error) {
-	cur, err := repository.collection.Find(repository.ctx, bson.M{"name": bson.M{"$regex": userName, "$options": "i"}})
+func (repository *Users) GetUser(taxNumber string) (entities.User, error) {
+	taxNumber = regexp.MustCompile(`[^0-9]+`).ReplaceAllString(taxNumber, "")
+	var user entities.User
+	err := repository.collection.FindOne(repository.ctx, bson.M{"taxNumber": taxNumber}).Decode(&user)
 	if err != nil {
-		return nil, err
+		return entities.User{}, errors.New("user not found")
 	}
 
-	defer cur.Close(repository.ctx)
-
-	var users []entities.User
-
-	for cur.Next(repository.ctx) {
-		var user entities.User
-		if err := cur.Decode(&user); err != nil {
-			return nil, err
-		}
-
-		users = append(users, user)
-	}
-
-	if len(users) == 0 {
-		return nil, errors.New("there are no registered users with this name")
-	}
-
-	return users, nil
+	return user, nil
 }
 
 func (repository *Users) GetUsers(options *options.FindOptions) ([]entities.User, error) {

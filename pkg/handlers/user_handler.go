@@ -49,10 +49,10 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	name := params["name"]
+	taxNumber := params["taxNumber"]
 
 	userRepository := repositories.CreateNewUserRepository()
-	response, err := userRepository.GetUser(name)
+	response, err := userRepository.GetUser(taxNumber)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
