@@ -9,6 +9,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +19,7 @@ type UserRepository struct {
 }
 
 func CreateNewUserRepository() *UserRepository {
-	collection := configuration.Client.Database(configuration.DBName).Collection("rental_companies")
+	collection := configuration.Client.Database(configuration.DBName).Collection("users")
 	return &UserRepository{collection, context.Background()}
 }
 
@@ -46,6 +47,21 @@ func (repository *UserRepository) CreateUser(user entities.User) (map[string]int
 	}
 
 	return res, nil
+}
+
+func (repository *UserRepository) GetUsers(options *options.FindOptions) ([]entities.User, error) {
+	var users []entities.User
+	options.SetProjection(bson.M{"password": 0})
+	cur, err := repository.collection.Find(repository.ctx, bson.M{}, options)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cur.All(repository.ctx, &users); err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
 
 func (repository *UserRepository) AuthenticateUser(user entities.User) (map[string]interface{}, error) {
