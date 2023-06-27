@@ -1,10 +1,14 @@
 package utils
 
 import (
+	"net/http"
 	"net/mail"
 	"regexp"
+	"strconv"
 	"time"
 	"unicode"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const layout = "02-01-2006"
@@ -62,4 +66,24 @@ func ReturnMessageOrValue(value interface{}, valueType string) interface{} {
 	}
 
 	return value
+}
+
+func Pagination(r *http.Request, FindOptions *options.FindOptions) (int64, int64) {
+	if r.URL.Query().Get("page") != "" && r.URL.Query().Get("limit") != "" {
+		page, _ := strconv.ParseInt(r.URL.Query().Get("page"), 10, 32)
+		limit, _ := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 32)
+		if page == 1 || page == 0 {
+			FindOptions.SetSkip(0)
+			FindOptions.SetLimit(limit)
+			return page, limit
+		}
+
+		FindOptions.SetSkip((page - 1) * limit)
+		FindOptions.SetLimit(limit)
+		return page, limit
+
+	}
+	FindOptions.SetSkip(0)
+	FindOptions.SetLimit(0)
+	return 0, 0
 }

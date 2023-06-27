@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func GetRentedBooks(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +95,8 @@ func GetAllReports(w http.ResponseWriter, r *http.Request) {
 	var rentedBooksByUser []map[string]interface{}
 	var numRentsByUser []map[string]interface{}
 	userRepository := repositories.CreateNewUserRepository()
-	users, err := userRepository.GetUsers()
+	options := options.Find()
+	users, err := userRepository.GetUsers(options)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return

@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"Api-Go/pkg/entities"
+	"Api-Go/pkg/entities/utils"
 	"Api-Go/pkg/repositories"
 	"Api-Go/pkg/responses"
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CreatePublisher(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +36,9 @@ func CreatePublisher(w http.ResponseWriter, r *http.Request) {
 
 func GetPublishers(w http.ResponseWriter, r *http.Request) {
 	publisherRepository := repositories.CreateNewPublishersRepository()
-	response, err := publisherRepository.GetPublishers()
+	options := options.Find()
+	_, _ = utils.Pagination(r, options)
+	response, err := publisherRepository.GetPublishers(options)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return

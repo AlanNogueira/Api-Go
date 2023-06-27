@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"Api-Go/pkg/entities"
+	"Api-Go/pkg/entities/utils"
 	"Api-Go/pkg/repositories"
 	"Api-Go/pkg/responses"
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CreateRent(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +37,9 @@ func CreateRent(w http.ResponseWriter, r *http.Request) {
 
 func GetNotDeliveredRents(w http.ResponseWriter, r *http.Request) {
 	rentRepository := repositories.CreateNewRentRepository()
-	reponse, err := rentRepository.GetNotDeliveredRents()
+	options := options.Find()
+	_, _ = utils.Pagination(r, options)
+	reponse, err := rentRepository.GetNotDeliveredRents(options)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return

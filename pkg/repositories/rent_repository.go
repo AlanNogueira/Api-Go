@@ -12,6 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Rents struct {
@@ -78,8 +79,8 @@ func (repository *Rents) CreateRent(rent entities.Rent) (map[string]interface{},
 
 	return res, nil
 }
-func (repository *Rents) GetNotDeliveredRents() ([]entities.Rent, error) {
-	cur, err := repository.collection.Find(repository.ctx, bson.M{"delivered": false})
+func (repository *Rents) GetNotDeliveredRents(options *options.FindOptions) ([]entities.Rent, error) {
+	cur, err := repository.collection.Find(repository.ctx, bson.M{"delivered": false}, options)
 	if err != nil {
 		return nil, err
 	}

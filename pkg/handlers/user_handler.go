@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"Api-Go/pkg/entities"
+	"Api-Go/pkg/entities/utils"
 	"Api-Go/pkg/repositories"
 	"Api-Go/pkg/responses"
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +36,9 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	userRepository := repositories.CreateNewUserRepository()
-	response, err := userRepository.GetUsers()
+	options := options.Find()
+	_, _ = utils.Pagination(r, options)
+	response, err := userRepository.GetUsers(options)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return

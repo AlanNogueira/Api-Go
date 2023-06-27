@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Publishers struct {
@@ -92,8 +93,8 @@ func (repository *Publishers) GetPublisher(publisherName string) ([]entities.Pub
 	return publishers, nil
 }
 
-func (repository *Publishers) GetPublishers() ([]entities.Publisher, error) {
-	cur, err := repository.collection.Find(repository.ctx, bson.D{})
+func (repository *Publishers) GetPublishers(options *options.FindOptions) ([]entities.Publisher, error) {
+	cur, err := repository.collection.Find(repository.ctx, bson.D{}, options)
 	if err != nil {
 		return nil, err
 	}

@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Books struct {
@@ -107,8 +108,8 @@ func (repository *Books) GetBook(bookData entities.Book) ([]entities.Book, error
 	return books, nil
 }
 
-func (repository *Books) GetBooks() ([]entities.Book, error) {
-	cur, err := repository.collection.Find(repository.ctx, bson.D{})
+func (repository *Books) GetBooks(options *options.FindOptions) ([]entities.Book, error) {
+	cur, err := repository.collection.Find(repository.ctx, bson.D{}, options)
 	if err != nil {
 		return nil, err
 	}

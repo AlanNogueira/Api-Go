@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Users struct {
@@ -102,8 +103,8 @@ func (repository *Users) GetUser(userName string) ([]entities.User, error) {
 	return users, nil
 }
 
-func (repository *Users) GetUsers() ([]entities.User, error) {
-	cur, err := repository.collection.Find(repository.ctx, bson.D{})
+func (repository *Users) GetUsers(options *options.FindOptions) ([]entities.User, error) {
+	cur, err := repository.collection.Find(repository.ctx, bson.D{}, options)
 	if err != nil {
 		return nil, err
 	}

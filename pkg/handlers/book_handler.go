@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CreateBook(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +63,9 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 
 func GetBooks(w http.ResponseWriter, r *http.Request) {
 	bookRepository := repositories.CreateNewBooksRepository()
-	response, err := bookRepository.GetBooks()
+	options := options.Find()
+	_, _ = utils.Pagination(r, options)
+	response, err := bookRepository.GetBooks(options)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
