@@ -6,6 +6,7 @@ import (
 	"Api-Go/pkg/repositories"
 	"Api-Go/pkg/responses"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -68,6 +69,17 @@ func UpdateClient(w http.ResponseWriter, r *http.Request) {
 	var client entities.Client
 	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
 		responses.Error(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	if client.TaxNumber != "" {
+		responses.Error(w, http.StatusBadRequest, errors.New("taxNumber cannot be updated"))
+		return
+
+	}
+
+	if client.Name != "" {
+		responses.Error(w, http.StatusBadRequest, errors.New("userName cannot be updated"))
 		return
 	}
 
