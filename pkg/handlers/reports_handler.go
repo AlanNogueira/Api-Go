@@ -62,6 +62,7 @@ func GetNumberRentsByClient(w http.ResponseWriter, r *http.Request) {
 	reponse, err := rentRepository.GetNumberRentsByClient(clientName)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	responses.JSON(w, http.StatusOK, reponse)

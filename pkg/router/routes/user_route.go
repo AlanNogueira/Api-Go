@@ -5,21 +5,21 @@ import (
 	"net/http"
 )
 
-var rentalCompanyRoutes = []Route{
+var userRoutes = []Route{
 	{
-		URI:                    "/rentalCompanies",
+		URI:                    "/user",
 		Method:                 http.MethodPost,
-		Function:               handlers.CreateRentalCompany,
+		Function:               handlers.CreateUser,
 		RequiresAuthentication: false,
 	},
 	{
-		URI:                    "/rentalCompanies",
+		URI:                    "/user",
 		Method:                 http.MethodGet,
-		Function:               handlers.CreateRentalCompany,
+		Function:               handlers.GetUsers,
 		RequiresAuthentication: false,
 	},
 	{
-		URI:                    "/rentalCompanies/authenticate",
+		URI:                    "/user/authenticate",
 		Method:                 http.MethodPost,
 		Function:               handlers.AuthenticateUser,
 		RequiresAuthentication: false,
@@ -27,5 +27,5 @@ var rentalCompanyRoutes = []Route{
 }
 
 func init() {
-	Routes = append(Routes, rentalCompanyRoutes...)
+	Routes = append(Routes, userRoutes...)
 }

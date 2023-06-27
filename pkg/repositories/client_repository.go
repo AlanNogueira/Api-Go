@@ -150,7 +150,7 @@ func (repository *Clients) UpdateClient(clientId string, clientNewData entities.
 func (repository *Clients) GetClientByName(clientName string) (entities.Client, error) {
 	var client entities.Client
 
-	err := repository.collection.FindOne(repository.ctx, bson.M{"name": clientName}).Decode(&client)
+	err := repository.collection.FindOne(repository.ctx, bson.M{"clientName": clientName}).Decode(&client)
 	if err != nil {
 		return entities.Client{}, errors.New("client not found")
 	}

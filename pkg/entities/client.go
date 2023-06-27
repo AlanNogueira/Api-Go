@@ -11,7 +11,7 @@ import (
 
 type Client struct {
 	Id        string        `bson:"_id,omitempty"`
-	Name      string        `bson:"userName,omitempty"`
+	Name      string        `bson:"clientName,omitempty"`
 	FullName  string        `bson:"fullName,omitempty"`
 	Email     string        `bson:"email,omitempty"`
 	Phone     string        `bson:"phone,omitempty"`
