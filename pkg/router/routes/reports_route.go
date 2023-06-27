@@ -19,9 +19,9 @@ var reportsRouters = []Route{
 		RequiresAuthentication: true,
 	},
 	{
-		URI:                    "/reports/GetNumberOfBooksRentsByUser/{userName}",
+		URI:                    "/reports/GetNumberOfBooksRentsByClient/{clientName}",
 		Method:                 http.MethodGet,
-		Function:               handlers.GetNumberOfBooksRentsByUser,
+		Function:               handlers.GetNumberOfBooksRentsByClient,
 		RequiresAuthentication: true,
 	},
 	{
@@ -31,9 +31,9 @@ var reportsRouters = []Route{
 		RequiresAuthentication: true,
 	},
 	{
-		URI:                    "/reports/GetRentsByUser/{userName}",
+		URI:                    "/reports/GetRentsByClient/{clientName}",
 		Method:                 http.MethodGet,
-		Function:               handlers.GetNumberRentsByUser,
+		Function:               handlers.GetNumberRentsByClient,
 		RequiresAuthentication: true,
 	},
 	{

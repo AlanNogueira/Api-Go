@@ -31,11 +31,11 @@ func GetNumberOfOverdueBooks(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, response)
 }
 
-func GetNumberOfBooksRentsByUser(w http.ResponseWriter, r *http.Request) {
+func GetNumberOfBooksRentsByClient(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	userName := params["userName"]
+	clientName := params["clientName"]
 	rentsRepository := repositories.CreateNewRentRepository()
-	response, err := rentsRepository.GetNumberOfBooksRentsByUser(userName)
+	response, err := rentsRepository.GetNumberOfBooksRentsByClient(clientName)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -54,12 +54,12 @@ func GetReturnedBooks(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, response)
 }
 
-func GetNumberRentsByUser(w http.ResponseWriter, r *http.Request) {
+func GetNumberRentsByClient(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	userName := params["userName"]
+	clientName := params["clientName"]
 
 	rentRepository := repositories.CreateNewRentRepository()
-	reponse, err := rentRepository.GetNumberRentsByUser(userName)
+	reponse, err := rentRepository.GetNumberRentsByClient(clientName)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 	}
@@ -92,30 +92,30 @@ func GetAllReports(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var rentedBooksByUser []map[string]interface{}
-	var numRentsByUser []map[string]interface{}
-	userRepository := repositories.CreateNewUserRepository()
+	var rentedBooksByClient []map[string]interface{}
+	var numRentsByClient []map[string]interface{}
+	clientRepository := repositories.CreateNewClientRepository()
 	options := options.Find()
-	users, err := userRepository.GetUsers(options)
+	clients, err := clientRepository.GetClients(options)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	for i := 0; i < len(users); i++ {
-		response, err := rentsRepository.GetNumberOfBooksRentsByUser(users[i].Name)
+	for i := 0; i < len(clients); i++ {
+		response, err := rentsRepository.GetNumberOfBooksRentsByClient(clients[i].Name)
 		if err != nil {
 			responses.Error(w, http.StatusInternalServerError, err)
 			return
 		}
-		rentedBooksByUser = append(rentedBooksByUser, response)
+		rentedBooksByClient = append(rentedBooksByClient, response)
 
-		reponse, err := rentsRepository.GetNumberRentsByUser(users[i].Name)
+		reponse, err := rentsRepository.GetNumberRentsByClient(clients[i].Name)
 		if err != nil {
 			responses.Error(w, http.StatusInternalServerError, err)
 			return
 		}
-		numRentsByUser = append(numRentsByUser, reponse)
+		numRentsByClient = append(numRentsByClient, reponse)
 	}
 
 	returnedBooks, err := rentsRepository.GetReturnedBooks()
@@ -133,12 +133,12 @@ func GetAllReports(w http.ResponseWriter, r *http.Request) {
 
 	res := map[string]interface{}{
 		"data": map[string]interface{}{
-			"NumberOfRentedBooks":      rentedBooks["NumberOfRentedBooks"],
-			"NumberOfOverdueBooks":     overdueBooks["NumberOfOverdueBooks"],
-			"NumberOfBooksRentsByUser": rentedBooksByUser,
-			"ReturnedBooks":            returnedBooks,
-			"NumberRentsByUser":        numRentsByUser,
-			"MostRentedBook":           mostRentedBook["mostRentedBook"],
+			"NumberOfRentedBooks":        rentedBooks["NumberOfRentedBooks"],
+			"NumberOfOverdueBooks":       overdueBooks["NumberOfOverdueBooks"],
+			"NumberOfBooksRentsByClient": rentedBooksByClient,
+			"ReturnedBooks":              returnedBooks,
+			"NumberRentsByClient":        numRentsByClient,
+			"MostRentedBook":             mostRentedBook["mostRentedBook"],
 		},
 	}
 

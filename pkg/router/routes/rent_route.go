@@ -19,7 +19,7 @@ var rentRoutes = []Route{
 		RequiresAuthentication: true,
 	},
 	{
-		URI:                    "/rents/{userName}",
+		URI:                    "/rents/{clientName}",
 		Method:                 http.MethodGet,
 		Function:               handlers.GetRent,
 		RequiresAuthentication: true,

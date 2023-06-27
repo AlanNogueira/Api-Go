@@ -12,20 +12,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user entities.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+func CreateClient(w http.ResponseWriter, r *http.Request) {
+	var client entities.Client
+	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
 		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	if err := user.Prepare(); err != nil {
+	if err := client.Prepare(); err != nil {
 		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	userRepository := repositories.CreateNewUserRepository()
-	response, err := userRepository.Create(user)
+	clientRepository := repositories.CreateNewClientRepository()
+	response, err := clientRepository.Create(client)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -34,11 +34,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, response)
 }
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
-	userRepository := repositories.CreateNewUserRepository()
+func GetClients(w http.ResponseWriter, r *http.Request) {
+	clientRepository := repositories.CreateNewClientRepository()
 	options := options.Find()
 	_, _ = utils.Pagination(r, options)
-	response, err := userRepository.GetUsers(options)
+	response, err := clientRepository.GetClients(options)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -47,12 +47,12 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, response)
 }
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func GetClient(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	taxNumber := params["taxNumber"]
 
-	userRepository := repositories.CreateNewUserRepository()
-	response, err := userRepository.GetUser(taxNumber)
+	clientRepository := repositories.CreateNewClientRepository()
+	response, err := clientRepository.GetClient(taxNumber)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -61,18 +61,18 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, response)
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func UpdateClient(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id := params["userId"]
+	id := params["clientId"]
 
-	var user entities.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var client entities.Client
+	if err := json.NewDecoder(r.Body).Decode(&client); err != nil {
 		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	userRepository := repositories.CreateNewUserRepository()
-	response, err := userRepository.UpdateUser(id, user)
+	clientRepository := repositories.CreateNewClientRepository()
+	response, err := clientRepository.UpdateClient(id, client)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
@@ -81,12 +81,12 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, response)
 }
 
-func RemoveUser(w http.ResponseWriter, r *http.Request) {
+func RemoveClient(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	id := params["userId"]
+	id := params["clientId"]
 
-	userRepository := repositories.CreateNewUserRepository()
-	response, err := userRepository.RemoveUser(id)
+	clientRepository := repositories.CreateNewClientRepository()
+	response, err := clientRepository.RemoveClient(id)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return

@@ -30,6 +30,10 @@ func CreateRentalCompany(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, response)
 }
 
+func GetRentalCompanies(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func AuthenticateUser(w http.ResponseWriter, r *http.Request) {
 	var rentalCompany entities.RentalCompany
 	if err := json.NewDecoder(r.Body).Decode(&rentalCompany); err != nil {

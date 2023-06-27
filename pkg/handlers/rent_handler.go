@@ -52,7 +52,7 @@ func GetRent(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	filters := map[string]string{
-		"userName":      params["userName"],
+		"clientName":    params["clientName"],
 		"bookAuthor":    r.URL.Query().Get("bookAuthor"),
 		"bookPublisher": r.URL.Query().Get("bookPublisher"),
 		"bookName":      r.URL.Query().Get("bookName"),

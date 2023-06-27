@@ -13,6 +13,12 @@ var rentalCompanyRoutes = []Route{
 		RequiresAuthentication: false,
 	},
 	{
+		URI:                    "/rentalCompanies",
+		Method:                 http.MethodGet,
+		Function:               handlers.CreateRentalCompany,
+		RequiresAuthentication: false,
+	},
+	{
 		URI:                    "/rentalCompanies/authenticate",
 		Method:                 http.MethodPost,
 		Function:               handlers.AuthenticateUser,

@@ -8,7 +8,7 @@ import (
 
 type Rent struct {
 	Id                   string           `bson:"_id,omitempty"`
-	UserName             string           `bson:"userName,omitempty"`
+	ClientName           string           `bson:"clientName,omitempty"`
 	BookName             string           `bson:"bookName,omitempty"`
 	BookPublisher        string           `bson:"bookPublisher,omitempty"`
 	BookAuthor           string           `bson:"bookAuthor,omitempty"`
@@ -28,8 +28,8 @@ func (rent *Rent) Prepare() error {
 func (rent *Rent) validate() error {
 	rentErrors := ""
 
-	if rent.UserName == "" {
-		rentErrors += "UserName, "
+	if rent.ClientName == "" {
+		rentErrors += "ClientName, "
 	}
 	if rent.BookName == "" {
 		rentErrors += "BookName, "
@@ -50,7 +50,7 @@ func (rent *Rent) validate() error {
 }
 
 func (rent *Rent) format() {
-	rent.UserName = strings.TrimSpace(rent.UserName)
+	rent.ClientName = strings.TrimSpace(rent.ClientName)
 	rent.BookName = strings.TrimSpace(rent.BookName)
 	rent.BookPublisher = strings.TrimSpace(rent.BookPublisher)
 	rent.BookAuthor = strings.TrimSpace(rent.BookAuthor)

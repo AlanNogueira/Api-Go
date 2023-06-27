@@ -28,7 +28,7 @@ func CreateNewRentRepository() *Rents {
 func (repository *Rents) CreateRent(rent entities.Rent) (map[string]interface{}, error) {
 	existRent, err := repository.collection.CountDocuments(repository.ctx,
 		bson.M{
-			"userName":      rent.UserName,
+			"clientName":    rent.ClientName,
 			"bookAuthor":    rent.BookAuthor,
 			"bookPublisher": rent.BookPublisher,
 			"bookName":      rent.BookName,
@@ -40,13 +40,13 @@ func (repository *Rents) CreateRent(rent entities.Rent) (map[string]interface{},
 	}
 	//Verificando se já existe algum aluguel aberto para o livro do mesmo usuário
 	if existRent > 0 {
-		return nil, errors.New("there is already an open rent for this book in this user's name")
+		return nil, errors.New("there is already an open rent for this book in this client's name")
 	}
 
 	//Verificando se o usuário existe
-	userRepository := CreateNewUserRepository()
-	if _, err := userRepository.GetUserByName(rent.UserName); err != nil {
-		return nil, errors.New("user not found")
+	clientRepository := CreateNewClientRepository()
+	if _, err := clientRepository.GetClientByName(rent.ClientName); err != nil {
+		return nil, errors.New("client not found")
 	}
 	//Verificando se o livro existe
 	bookRepository := CreateNewBooksRepository()
@@ -107,7 +107,7 @@ func (repository *Rents) GetNotDeliveredRents(options *options.FindOptions) ([]e
 
 func (repository *Rents) GetRent(filters map[string]string) ([]entities.Rent, error) {
 	fil := bson.M{
-		"userName":      bson.M{"$regex": filters["userName"], "$options": "i"},
+		"clientName":    bson.M{"$regex": filters["clientName"], "$options": "i"},
 		"bookAuthor":    bson.M{"$regex": filters["bookAuthor"], "$options": "i"},
 		"bookPublisher": bson.M{"$regex": filters["bookPublisher"], "$options": "i"},
 		"bookName":      bson.M{"$regex": filters["bookName"], "$options": "i"},
@@ -191,8 +191,8 @@ func (repository *Rents) FinalizeRent(rentId string) (map[string]interface{}, er
 	return res, nil
 }
 
-func (repository *Rents) CheckRentedBooksByUserName(userName string) (bool, error) {
-	exists, err := repository.collection.CountDocuments(repository.ctx, bson.M{"userName": userName, "delivered": false})
+func (repository *Rents) CheckRentedBooksByClientName(clientName string) (bool, error) {
+	exists, err := repository.collection.CountDocuments(repository.ctx, bson.M{"clientName": clientName, "delivered": false})
 	if err != nil {
 		return false, err
 	}
@@ -200,18 +200,18 @@ func (repository *Rents) CheckRentedBooksByUserName(userName string) (bool, erro
 	return exists > 0, nil
 }
 
-func (repository *Rents) GetNumberRentsByUser(userName string) (map[string]interface{}, error) {
-	numRents, err := repository.collection.CountDocuments(repository.ctx, bson.M{"userName": userName})
+func (repository *Rents) GetNumberRentsByClient(clientName string) (map[string]interface{}, error) {
+	numRents, err := repository.collection.CountDocuments(repository.ctx, bson.M{"clientName": clientName})
 	if err != nil {
 		return nil, err
 	}
 
 	if numRents == 0 {
-		return nil, errors.New("this user has no rentals")
+		return nil, errors.New("this client has no rentals")
 	}
 
 	res := map[string]interface{}{
-		"userName":    userName,
+		"clientName":  clientName,
 		"NumberRents": numRents,
 	}
 
@@ -296,11 +296,11 @@ func (repository *Rents) GetNumberOfOverdueBooks() (map[string]interface{}, erro
 	return res, nil
 }
 
-func (repository *Rents) GetNumberOfBooksRentsByUser(userName string) (map[string]interface{}, error) {
+func (repository *Rents) GetNumberOfBooksRentsByClient(clientName string) (map[string]interface{}, error) {
 	pipe := []bson.M{
 		{
 			"$match": bson.M{
-				"userName": userName,
+				"clientName": clientName,
 			},
 		},
 		{
@@ -322,12 +322,12 @@ func (repository *Rents) GetNumberOfBooksRentsByUser(userName string) (map[strin
 	}
 
 	if len(mostRentedBooks) == 0 {
-		return nil, errors.New("this user has no rentals")
+		return nil, errors.New("this client has no rentals")
 	}
 
 	res := map[string]interface{}{
-		"userName": userName,
-		"books":    mostRentedBooks,
+		"clientName": clientName,
+		"books":      mostRentedBooks,
 	}
 
 	return res, nil
