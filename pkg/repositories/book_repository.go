@@ -5,6 +5,7 @@ import (
 	"Api-Go/pkg/entities"
 	"context"
 	"errors"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -76,13 +77,18 @@ func (repository *Books) RemoveBook(bookId string) (map[string]interface{}, erro
 	return res, nil
 }
 
-func (repository *Books) GetBook(bookData entities.Book) ([]entities.Book, error) {
-	cur, err := repository.collection.Find(repository.ctx,
-		bson.M{
-			"name":             bson.M{"$regex": bookData.Name, "$options": "i"},
-			"author":           bson.M{"$regex": bookData.Author, "$options": "i"},
-			"publisher":        bson.M{"$regex": bookData.Publisher, "$options": "i"},
-			"releaseDate.time": bson.M{"$eq": bookData.ReleaseDate.Time}})
+func (repository *Books) GetBook(filters map[string]string) ([]entities.Book, error) {
+	fil := bson.M{
+		"name":      bson.M{"$regex": filters["name"], "$options": "i"},
+		"author":    bson.M{"$regex": filters["author"], "$options": "i"},
+		"publisher": bson.M{"$regex": filters["publisher"], "$options": "i"},
+	}
+	if filters["releaseDate"] != "" {
+		time, _ := time.Parse("02-01-2006", filters["releaseDate"])
+		fil["releaseDate.time"] = bson.M{"$eq": primitive.NewDateTimeFromTime(time)}
+	}
+
+	cur, err := repository.collection.Find(repository.ctx, fil)
 	if err != nil {
 		return nil, err
 	}

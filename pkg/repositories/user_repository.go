@@ -24,9 +24,9 @@ func CreateNewUserRepository() *UserRepository {
 }
 
 func (repository *UserRepository) CreateUser(user entities.User) (map[string]interface{}, error) {
-	exists, _ := repository.collection.CountDocuments(repository.ctx, bson.M{"email": user.Email, "name": user.Name})
+	exists, _ := repository.collection.CountDocuments(repository.ctx, bson.M{"email": user.Email})
 	if exists > 0 {
-		return nil, errors.New("a user with this name and email already exists")
+		return nil, errors.New("a user with this email already exists")
 	}
 
 	if err := user.GetHash(); err != nil {

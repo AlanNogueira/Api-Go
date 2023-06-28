@@ -38,21 +38,20 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 
 func GetBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	name := params["name"]
-	author := r.URL.Query().Get("author")
-	publisher := r.URL.Query().Get("publisher")
 	releaseDate := r.URL.Query().Get("releaseDate")
-	time, _ := time.Parse("02-01-2006", releaseDate)
-
-	book := entities.Book{
-		Name:        name,
-		Author:      author,
-		Publisher:   publisher,
-		ReleaseDate: utils.CustomTime{Time: time},
+	if releaseDate != "" {
+		time, _ := time.Parse("02-01-2006", releaseDate)
+		releaseDate = time.Format("02-01-2006")
+	}
+	filters := map[string]string{
+		"name":        params["name"],
+		"author":      r.URL.Query().Get("author"),
+		"publisher":   r.URL.Query().Get("publisher"),
+		"releaseDate": releaseDate,
 	}
 
 	bookRepository := repositories.CreateNewBooksRepository()
-	response, err := bookRepository.GetBook(book)
+	response, err := bookRepository.GetBook(filters)
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
